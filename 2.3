@@ -1,0 +1,33 @@
+
+Module Program
+    Sub Main()
+        Dim ItemDescription As String
+        Dim ItemCode As String
+        Dim ItemPrice As Decimal
+        Dim NumberInStock As Integer
+        Dim Report As String
+
+        Console.Write("Enter the Item Description: ")
+        ItemDescription = Console.ReadLine()
+
+        Console.Write("Enter the Item Code: ")
+        ItemCode = Console.ReadLine()
+
+        Console.Write("Enter the Item Price: ")
+        ItemPrice = Console.ReadLine()
+
+        Console.Write("Enter the Number In Stock for this item: ")
+        NumberInStock = Console.ReadLine()
+
+        Report = (Convert.ToString("Item Description: " & ItemDescription & ",  Price: $" & ItemPrice & ",  Item Code: " & ItemCode & ",  Number In Stock: " & NumberInStock))
+
+        Dim FileHandle As IO.StreamWriter
+            Dim LineOfText As String
+            LineOfText = (Report)
+            FileHandle = New IO.StreamWriter("SampleFile8.TXT", True)
+            FileHandle.WriteLine(LineOfText)
+            FileHandle.Close()
+
+
+    End Sub
+End Module
