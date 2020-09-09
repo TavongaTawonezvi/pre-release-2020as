@@ -1,0 +1,36 @@
+
+Module Program
+    Sub Main()
+        Dim ItemDescription As String()
+        Dim ItemCode As String()
+        Dim ItemPrice As Decimal()
+        Dim NumberInStock As Integer()
+        Dim MaxIndex As Integer
+        Dim SearchValue As String
+        Dim ItemIndex As Integer
+        Dim Report As String
+        ItemIndex = 0
+        MaxIndex = 7
+        ItemDescription = {"Banana", "Orange", "Apple", "Grapes", "Grape Fruit", "Pineapple", "Avocado", "Plum"}
+        ItemCode = {"3c90240", "2n995641", "3k894512", "7g889403", "7v345674", "9o674655", "0b763856", "1x378457"}
+        ItemPrice = {10.09, 14.13, 12.24, 11.38, 29.46, 20.53, 19.64, 19.73}
+        NumberInStock = {306, 117, 620, 734, 41, 959, 1160, 71}
+        Console.WriteLine("Enter the minimum number in stock level: ")
+        SearchValue = Console.ReadLine()
+        Do
+            ItemIndex = ItemIndex + 1
+            If NumberInStock(ItemIndex) < SearchValue Then
+                Report = (Convert.ToString("Item Description: " & ItemDescription(ItemIndex) & ",  Price: $" & ItemPrice(ItemIndex) & ",  Item Code: " & ItemCode(ItemIndex) & ",  Number In Stock: " & NumberInStock(ItemIndex)))
+                Console.WriteLine(Report)
+                Dim FileHandle As IO.StreamWriter
+                Dim LineOfText As String
+                LineOfText = (Report)
+                FileHandle = New IO.StreamWriter("SampleFile7.TXT", True)
+                FileHandle.WriteLine(LineOfText)
+                FileHandle.Close()
+            End If
+        Loop Until ItemIndex >= MaxIndex
+
+
+    End Sub
+End Module
