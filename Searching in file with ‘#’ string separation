@@ -1,0 +1,45 @@
+Imports System.IO
+ Module Module1 Sub Main()
+ Dim Members As New System.IO.StreamReader("C:\AS-Work\members.txt")
+ Dim listMembers(10) As String
+ Dim i As Integer
+ i=0
+ Do Until Members.EndOfStream
+ listMembers(i) = Members.ReadLine()
+ Console.WriteLine(listMembers(i))
+ Loop
+i=i+1
+  Members.Close()
+ Dim n As Integer
+ Dim nextchar As Char
+ Dim namelength, IDlength As Integer
+ Dim Firstname As String
+ Dim IDemail As String
+ Dim FullName As String
+ Console.WriteLine()
+ Console.WriteLine("--------------------------------------")
+ Console.WriteLine("NAME" & Space(6) & "USERID" & Space(6) & "EMAIL")
+ Console.WriteLine("**************************************")
+ For i = 0 To listMembers.Count - 1
+ FullName = listMembers(i)
+ n=0
+ nextchar = ""
+ While nextchar <> "#"
+ n=n+1
+ nextchar = Mid(FullName, n, 1)
+ End While
+ namelength = n - 1
+ Firstname = Left(FullName, namelength)
+ IDemail = Mid(FullName, n + 1)
+ n=0
+ nextchar = ""
+ While nextchar <> "#"
+ n=n+1
+ nextchar = Mid(IDemail, n, 1)
+ End While
+ IDlength = n - 1
+ Console.WriteLine(Firstname & Space(10 - namelength) & Left(IDemail, IDlength) & Space(12 - IDlength) & Mid(IDemail, n + 1))
+ Next
+ Console.ReadKey()
+ End Sub
+ End Module
