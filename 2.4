@@ -1,8 +1,11 @@
-Imports System
+Imports System.IO
 Imports System.Text.RegularExpressions
 
 Module Program
 
+    Dim Reader As StreamReader
+    Dim Writer As StreamWriter
+    
     Sub Main()
         Dim ItemDescription As String
         Dim ItemCode As String
@@ -26,11 +29,11 @@ Module Program
             Case "A", "a"
                 Call EnterNewItem(ItemDescription, ItemCode, ItemPrice, NumberInStock, Report)
             Case "B", "b"
-                Call ItemCodeFileSearch(ItemCode)
+                Call ItemCodeFileSearch(ItemCode, ItemPrice, NumberInStock, ItemDescription)
             Case "C", "c"
-                Call ItemDescriptionFileSearch(ItemDescription)
+                Call ItemDescriptionFileSearch(ItemDescription, ItemCode, ItemPrice, NumberInStock)
             Case "D", "d"
-                Call PriceFileSearch(ItemPrice, ItemDescription)
+                Call PriceFileSearch(ItemPrice, ItemDescription, ItemCode, NumberInStock)
             Case Else
                 Console.WriteLine("Invalid Menu Operation")
         End Select
@@ -44,16 +47,16 @@ Module Program
         ItemDescription = Console.ReadLine()
         Console.WriteLine(" ")
 
-        Console.Write("Enter the Item Code (5 digits & 3 letters): ")
+        Console.Write("Enter the Item Code (must be three digits and un uppecase letter): ")
         ItemCode = Console.ReadLine()
-        If Regex.IsMatch(ItemCode, "[0-9][0-9][0-9][0-9][0-9][A-Za-z][A-Za-z][A-Za-z]") Then
+        If Regex.IsMatch(ItemCode, "[0-9][0-9][0-9][A-Z]") Then
             ItemCode = ItemCode
         Else
             Do
                 Console.WriteLine("Invalid Item Code !")
                 Console.WriteLine("Enter a valid item code:")
                 ItemCode = Console.ReadLine()
-            Loop Until Regex.IsMatch(ItemCode, "[0-9][0-9][0-9][0-9][0-9][A-Za-z][A-Za-z][A-Za-z]")
+            Loop Until Regex.IsMatch(ItemCode, "[0-9][0-9][0-9][A-Z]")
         End If
         Console.WriteLine(" ")
 
@@ -66,31 +69,48 @@ Module Program
         NumberInStock = Console.ReadLine()
         Console.WriteLine(" ")
 
-
-        Dim FileHandle As IO.StreamWriter
+        Writer = New StreamWriter("C:\Users\tavonga\source\repos\Pre-ReleaseON20\bin\Debug\netcoreapp3.1\SampleFile8.txt", True)
         Dim LineOfText As String
-        LineOfText = "Item Description: " & ItemDescription & ",  Item Code: " & ItemCode & ",  Number In Stock: " & NumberInStock & ",  Price: $" & ItemPrice & "/"
+        LineOfText = ItemDescription & "*" & ItemCode & "*" & ItemPrice & "*" & NumberInStock
 
-        FileHandle = New IO.StreamWriter("SampleFile8.TXT", True)
-        FileHandle.WriteLine(LineOfText)
-        FileHandle.Close()
+        Writer.WriteLine(LineOfText)
+        Writer.Close()
+        Console.WriteLine("Details entered successfully")
     End Sub
 
 
-    Sub ItemCodeFileSearch(ItemCode As String)
-        Dim FilePath As String
+    Sub ItemCodeFileSearch(ItemDescription As String, ItemCode As String, ItemPrice As Double, NumberInStock As Integer)
+        Dim SearchItem As String
+        Dim ItemDetails As String()
+        Dim FileLine As String
+
 
         Console.WriteLine("Enter the Code for the item you want to preview:")
-        ItemCode = Console.ReadLine()
+        SearchItem = Console.ReadLine()
 
-        FilePath = "C:\Users\tavonga\source\repos\Pre-ReleaseON20\bin\Debug\netcoreapp3.1\SampleFile8.txt"
+        Reader = New StreamReader("C:\Users\tavonga\source\repos\Pre-ReleaseON20\bin\Debug\netcoreapp3.1\SampleFile8.txt")
         Dim Found As Boolean = False
-        For Each line As String In IO.File.ReadLines(FilePath)
-            If line.Contains(ItemCode) Then
+        FileLine = Reader.ReadLine
+        Do
+            ItemDetails = FileLine.Split("*")
+            ItemDescription = ItemDetails(0)
+            ItemCode = ItemDetails(1)
+            ItemPrice = ItemDetails(2)
+            NumberInStock = ItemDetails(3)
+
+            If ItemCode = SearchItem Then
+                Console.WriteLine("               Item found                 ")
+                Console.WriteLine("Description: " & ItemDescription)
+                Console.WriteLine("Item Code: " & ItemCode)
+                Console.WriteLine("Price: $" & ItemPrice)
+                Console.WriteLine("Number in stock: " & NumberInStock)
                 Found = True
-                Console.WriteLine(line)
             End If
-        Next
+
+            FileLine = Reader.ReadLine
+        Loop Until Reader.EndOfStream
+        Reader.Close()
+
         If Found = False Then
             Console.WriteLine("No matching Item Code Found")
         End If
@@ -98,20 +118,37 @@ Module Program
     End Sub
 
 
-    Sub ItemDescriptionFileSearch(ItemDescription As String)
-        Dim FilePath As String
+    Sub ItemDescriptionFileSearch(ItemDescription As String, ItemCode As String, ItemPrice As Double, NumberInStock As Integer)
+        Dim SearchItem As String
+        Dim ItemDetails As String()
+        Dim FileLine As String
+
 
         Console.WriteLine("Enter the Description for the item you want to preview:")
-        ItemDescription = Console.ReadLine()
+        SearchItem = Console.ReadLine()
 
-        FilePath = "C:\Users\tavonga\source\repos\Pre-ReleaseON20\bin\Debug\netcoreapp3.1\SampleFile8.txt"
         Dim Found As Boolean = False
-        For Each line As String In IO.File.ReadLines(FilePath)
-            If line.Contains(ItemDescription) Then
+        Reader = New StreamReader("C:\Users\tavonga\source\repos\Pre-ReleaseON20\bin\Debug\netcoreapp3.1\SampleFile8.txt")
+        FileLine = Reader.ReadLine
+        Do
+            ItemDetails = FileLine.Split("*")
+            ItemDescription = ItemDetails(0)
+            ItemCode = ItemDetails(1)
+            ItemPrice = ItemDetails(2)
+            NumberInStock = ItemDetails(3)
+
+            If ItemDescription = SearchItem Then
+                Console.WriteLine("               Item found                 ")
+                Console.WriteLine("Description: " & ItemDescription)
+                Console.WriteLine("Item Code: " & ItemCode)
+                Console.WriteLine("Price: $" & ItemPrice)
+                Console.WriteLine("Number in stock: " & NumberInStock)
                 Found = True
-                Console.WriteLine(line)
             End If
-        Next
+
+            FileLine = Reader.ReadLine
+        Loop Until Reader.EndOfStream
+        Reader.Close()
         If Found = False Then
             Console.WriteLine("No matching Item Description Found")
         End If
@@ -120,33 +157,34 @@ Module Program
     End Sub
 
 
-    Sub PriceFileSearch(ItemPrice As Decimal, ItemDescription As String)
+    Sub PriceFileSearch(ItemPrice As Decimal, ItemDescription As String, ItemCode As String, NumberInStock As Integer)
 
-        Dim FilePath As String
-        Dim line As String
         Dim Found As Boolean = False
-        Dim FinalString As String
-        Dim FirstCharIndex As Integer
-        Dim LastCharIndex As Integer
         Dim SearchPrice As Decimal
+        Dim ItemDetails As String()
+        Dim FileLine As String
 
         Console.WriteLine("Enter the min price for the items you want to preview:")
         SearchPrice = Console.ReadLine()
 
-        FilePath = "C:\Users\tavonga\source\repos\Pre-ReleaseON20\bin\Debug\netcoreapp3.1\SampleFile8.txt"
+        Reader = New StreamReader("C:\Users\tavonga\source\repos\Pre-ReleaseON20\bin\Debug\netcoreapp3.1\SampleFile8.txt")
+        FileLine = Reader.ReadLine
+        Do
+            ItemDetails = FileLine.Split("*")
+            ItemDescription = ItemDetails(0)
+            ItemCode = ItemDetails(1)
+            ItemPrice = ItemDetails(2)
+            NumberInStock = ItemDetails(3)
 
-        For Each line In IO.File.ReadLines(FilePath)
-            FirstCharIndex = line.IndexOf("$") + 1
-            LastCharIndex = line.IndexOf("/")
-
-            FinalString = line.Substring(FirstCharIndex, (LastCharIndex - FirstCharIndex))
-            ItemPrice = Convert.ToDecimal(FinalString)
             If ItemPrice > SearchPrice Then
-                Console.WriteLine(line)
+                Console.WriteLine("Item Description: " & ItemDescription & ",  Item Code: " & ItemCode & ",  Price: $" & ItemPrice & ",  Number In Stock: " & NumberInStock)
+
                 Found = True
             End If
-        Next
 
+            FileLine = Reader.ReadLine
+        Loop Until Reader.EndOfStream
+        Reader.Close()
         If Found = False Then
             Console.WriteLine("None of the items are greater than the searched price")
         Else
@@ -163,3 +201,4 @@ Module Program
 
 
 End Module
+
